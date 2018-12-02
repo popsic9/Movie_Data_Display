@@ -2,6 +2,7 @@
 # https://github.com/github/gitignore/blob/master/Python.gitignore
 # https://github.com/django/django/blob/master/.gitignore
 # https://www.gitignore.io/api/django,python,intellij (bloated)
+.DS_Store
 
 ### Django ###
 *.log
