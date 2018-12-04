@@ -1,0 +1,29 @@
+{% extends 'movierating/base.html' %}
+{% block content %}
+<article>
+
+  <header>
+    <div class="row">
+      <div class="col-sm-11">
+        <h2>Movie Rating Sites</h2>
+      </div>
+    </div>
+  </header>
+
+  {% include 'movierating/pagination.html' %}
+
+  {% if movies %}
+  <ul>
+    {% for movie in movies %}
+    <li><a href="{% url 'movie_detail' movie.pk %}">{{ movie.movie_title | safe }}</a></li>
+    {% endfor %}
+
+
+  </ul>
+  {% else %}
+  <p>No Movies are available to view.</p>
+  {% endif %}
+
+  <p>page count: {{ movies.count }}</p>
+</article>
+{% endblock content %}}

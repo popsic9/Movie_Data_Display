@@ -1,6 +1,9 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
-   path('', views.index, name='index'),
+   path('', views.HomePageView.as_view(), name='home'),
+   path('about/', views.AboutPageView.as_view(), name='about'),
+   path('movies/', views.MovieListView.as_view(), name='movies'),
+   path('movies/<int:pk>/', views.MovieDetailView.as_view(), name='movie_detail'),
 ]

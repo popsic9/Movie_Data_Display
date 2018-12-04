@@ -23,34 +23,6 @@ class AgeRange(models.Model):
         return self.age_range_name
 
 
-class Genre(models.Model):
-    genre_id = models.AutoField(primary_key=True)
-    genre_name = models.CharField(unique=True, max_length=45)
-
-    class Meta:
-        managed = False
-        db_table = 'genre'
-        ordering = ['genre_name']
-        verbose_name = 'Movie Genre Classification'
-        verbose_name_plural = 'Movie Genre Classification'
-
-    def __str__(self):
-        return self.genre_name
-
-
-class Rating(models.Model):
-    rating_id = models.AutoField(primary_key=True)
-    rating = models.FloatField(unique=True)
-
-    class Meta:
-        managed = False
-        db_table = 'rating'
-        ordering = ['rating']
-        verbose_name = 'Movie Rating Classification'
-        verbose_name_plural = 'Movie Rating Classification'
-
-    def __str__(self):
-        return self.rating
 
 
 class Work(models.Model):
@@ -68,15 +40,44 @@ class Work(models.Model):
         return self.work_name
 
 
+class Genre(models.Model):
+    genre_id = models.AutoField(primary_key=True)
+    genre_name = models.CharField(max_length=45)
+
+    class Meta:
+        managed = False
+        db_table = 'genre'
+        ordering = ['genre_name']
+        verbose_name = 'Movie Genre Classification'
+        verbose_name_plural = 'Movie Genre Classification'
+
+    def __str__(self):
+        return self.genre_name
+
+class Rating(models.Model):
+    rating_id = models.AutoField(primary_key=True)
+    rating = models.FloatField(unique=True)
+
+    class Meta:
+        managed = False
+        db_table = 'rating'
+        ordering = ['rating']
+        verbose_name = 'Movie Rating Classification'
+        verbose_name_plural = 'Movie Rating Classification'
+
+    def __str__(self):
+        if self.rating == None:
+            return ""
+        else:
+            return str(self.rating)
 
 class Movie(models.Model):
     movie_id = models.IntegerField(primary_key=True)
     movie_title = models.CharField(max_length=100)
     imdbid = models.IntegerField(blank=True, null=True)
     tmdbid = models.IntegerField(blank=True, null=True)
-    genre = models.ManyToManyField(Genre, through='MovieGenre')
-    rating = models.ManyToManyField(Rating, through='MovieRating')
-    
+    genre = models.ManyToManyField('Genre', through='MovieGenre')
+    user_rating = models.ManyToManyField('User', through='MovieRating')
 
     class Meta:
         managed = False
@@ -89,7 +90,39 @@ class Movie(models.Model):
         return self.movie_title
 
 
+class MovieRating(models.Model):
+    movie_rating_id = models.IntegerField(primary_key=True)
+    user = models.ForeignKey('User', models.DO_NOTHING)
+    movie = models.ForeignKey('Movie', models.DO_NOTHING)
+    rating = models.ForeignKey('Rating', models.DO_NOTHING)
+    timestamp = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'movie_rating'
+        ordering = ['user', 'movie', 'rating']
+        verbose_name = 'User Movie Rating'
+        verbose_name_plural = 'User Movie Rating'
+    
+class Tag(models.Model):
+    tag_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey('User', models.DO_NOTHING)
+    movie = models.ForeignKey('Movie', models.DO_NOTHING, related_name='tags')
+    tag = models.CharField(max_length=100, blank=True, null=True)
+    timestamp = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'tag'
+        ordering = ['user', 'movie', 'tag']
+        verbose_name = 'User Movie Tag'
+        verbose_name_plural = 'User Movie Tag'
+    
+    def __str__(self):
+        return self.tag
+
 class MovieGenre(models.Model):
+    movie_genre_id = models.IntegerField(primary_key=True)
     movie = models.ForeignKey(Movie, models.DO_NOTHING)
     genre = models.ForeignKey(Genre, models.DO_NOTHING)
 
@@ -101,39 +134,10 @@ class MovieGenre(models.Model):
         verbose_name_plural = 'Movie Genres'
 
 
-class MovieRating(models.Model):
-    user = models.ForeignKey('User', models.DO_NOTHING)
-    movie = models.ForeignKey(Movie, models.DO_NOTHING)
-    rating = models.ForeignKey('Rating', models.DO_NOTHING)
-    timestamp = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'movie_rating'
-        ordering = ['user', 'movie', 'rating']
-        verbose_name = 'User Movie Rating'
-        verbose_name_plural = 'User Movie Rating'
 
 
 
 
-
-class Tag(models.Model):
-    tag_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING)
-    movie = models.ForeignKey(Movie, models.DO_NOTHING)
-    tag = models.CharField(max_length=100, blank=True, null=True)
-    timestamp = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'tag'
-        ordering = ['user', 'movie', 'tag']
-        verbose_name = 'User Movie Tag'
-        verbose_name_plural = 'User Movie Tag'
-
-    def __str__(self):
-        return self.user + "'s tag for movie " + self.movie + " is " + self.tag
 
 
 class User(models.Model):
@@ -143,7 +147,6 @@ class User(models.Model):
     zipcode = models.CharField(max_length=45, blank=True, null=True)
     age_range = models.ForeignKey(AgeRange, models.DO_NOTHING, blank=True, null=True)
     work = models.ForeignKey('Work', models.DO_NOTHING, blank=True, null=True)
-    rating = models.ManyToManyField(Rating, through='MovieRating')
 
     class Meta:
         managed = False
@@ -153,7 +156,7 @@ class User(models.Model):
         verbose_name_plural = 'User Description'
 
     def __str__(self):
-        return self.user_id
+        return str(self.user_id)
 
 
 

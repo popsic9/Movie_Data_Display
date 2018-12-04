@@ -30,7 +30,7 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    url(r'^$', lambda r: HttpResponseRedirect('movierating/')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^movierating/', include('movierating.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('', lambda r: HttpResponseRedirect('movierating/')),
+    path('admin/', admin.site.urls),
+    path('movierating/', include('movierating.urls')),
+]

@@ -1,0 +1,101 @@
+{% extends 'movierating/base.html' %}
+   
+   <!-- safe filter on for raw HTML stored in database -->
+   {% block content %}
+     <header>
+       <div class="row">
+         <div class="col-sm-10">
+           <h2>{{ movie.movie_title | safe }}</h2>
+         </div>
+         
+         
+       </div>
+     </header>
+   
+       {% if movie.imdbid %}
+          <div class="row">
+            <div class="col-sm-2">
+              <p>IMDBId</p>
+            </div>
+            <div class="col-sm-10">
+              <p>{{ movie.imdbid }}</p>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if movie.tmdbid %}
+          <div class="row">
+            <div class="col-sm-2">
+              <p>TMDBId</p>
+            </div>
+            <div class="col-sm-10">
+              <p>{{ movie.tmdbid }}</p>
+            </div>
+          </div>
+        {% endif %}
+
+        
+
+        {% if movie.genre %}
+          <div class="row">
+            <div class="col-sm-2">
+              <p>Genres</p>
+            </div>
+            <div class="col-sm-10">
+              {% for g in movie.genre.all %}
+                {{ g }}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+
+        {% if movie.tags %}
+          <div class="row">
+            <div class="col-sm-2">
+              <p>Tags</p>
+            </div>
+            <div class="col-sm-10">
+              {% for g in movie.tags.all %}
+                {{ g }},
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+          
+
+        {% if movie.user_rating %}
+          <div class="row">
+            <div class="col-sm-2">
+              <p>Movie Rating</p>
+            </div>
+            <div class="col-sm-10">
+                <table border="1">
+                  <tr>
+                    <th>User Id</th>
+                    <th>Gender</th>
+                    <th>Age Range</th>
+                    <th>Zipcode</th>
+                    <th>Work</th>
+                    <th>Rating To Movie</th>
+                    <th>TimeStamp</th>
+                  </tr>
+                  {% for r in movie.movierating_set.all %}
+                  <tr>
+                    <td>{{ r.user.user_id }}</td>
+                    <td>{{ r.user.gender }}</td>
+                    <td>{{ r.user.age_range }}</td>
+                    <td>{{ r.user.zipcode }}</td>
+                    <td>{{ r.user.work }}</td>
+                    <td>{{ r.rating }}</td>
+                    <td>{{ r.timestamp }}</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+            </div>
+          </div>
+        {% endif %}
+
+  
+        
+   {% endblock content %}
