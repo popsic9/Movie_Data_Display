@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.urls import reverse
 
 
 class AgeRange(models.Model):
@@ -88,6 +89,24 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.movie_title
+
+    def get_absolute_url(self):
+        return reverse('movie_detail', kwargs={'pk':self.pk})
+    
+    @property
+    def genre_names(self):
+        genres = self.genre.order_by('genre_name')
+        names = []
+        for g in genres:
+            name = g.genre_name
+            if name is None:
+                continue
+            if name not in names:
+                names.append(name)
+        names.sort()
+        return ', '.join(names)
+
+    
 
 
 class MovieRating(models.Model):

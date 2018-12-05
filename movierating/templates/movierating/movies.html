@@ -1,5 +1,6 @@
 {% extends 'movierating/base.html' %}
 {% block content %}
+{% if user.is_authenticated %}
 <article>
 
   <header>
@@ -7,6 +8,11 @@
       <div class="col-sm-11">
         <h2>Movie Rating Sites</h2>
       </div>
+      <div class="col-sm-1">
+          {% if user.is_authenticated %}
+            <a class="btn btn-outline-secondary" href="{% url 'movie_new' %}">new</a>
+          {% endif %}
+        </div>
     </div>
   </header>
 
@@ -26,4 +32,7 @@
 
   <p>page count: {{ movies.count }}</p>
 </article>
+{% else %}
+  <a href="{% url 'login' %}">Log in</a>
+{% endif %}
 {% endblock content %}}

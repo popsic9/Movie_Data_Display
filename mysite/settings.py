@@ -19,6 +19,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='368902674837-v4ajkohn11i47ge88if51eejvdercc8e.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VTC7IQxwh-p2OTGn-aCnQ_6L'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+LOGIN_URL = '/auth/login/google-oauth2/'
+# LOGIN_URL = 'login'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^8slr!f&@w%$1q+0!fv9r#u@*(8^prx3%=fjrqf16u)hkg-=1v'
 
@@ -38,6 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'movierating.apps.MovieratingConfig',
+    'crispy_forms',
+    'social_django', 
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -63,6 +76,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -104,6 +119,19 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    # 'social_core.backends.open_id.OpenIdAuth',
+    # 'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',                                
+    # 'social_core.backends.google.GoogleOAuth',
+    # 'social_core.backends.twitter.TwitterOAuth',
+    # 'social_core.backends.yahoo.YahooOpenId',
+    'django.contrib.auth.backends.ModelBackend',                              
+)
+
+# django-crispy-forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 # Internationalization

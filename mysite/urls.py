@@ -28,9 +28,14 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path, include
 
+from django.contrib.auth.views import LoginView, LogoutView
+
 
 urlpatterns = [
     path('', lambda r: HttpResponseRedirect('movierating/')),
     path('admin/', admin.site.urls),
     path('movierating/', include('movierating.urls')),
-]
+    path('auth/', include('social_django.urls', namespace='social')),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), {'next_page': settings.LOGOUT_REDIRECT_URL}, name='logout'),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

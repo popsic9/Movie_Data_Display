@@ -1,0 +1,62 @@
+{% extends 'movierating/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <header>
+    <h2>New Movie</h2>
+  </header>
+
+  <!-- novalidate attribute required to render validation messages -->
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-6">
+        {{ form.movie_title|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        {{ form.imdbid|as_crispy_field }}
+      </div>
+    </div>
+
+
+    <!-- Restore missing fields rendered using Bootstrap rows and columns classes --> 
+    
+    <div class="row">
+        <div class="col-6">
+          {{ form.tmdbid|as_crispy_field }}
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col-6">
+            {{ form.genre|as_crispy_field }}
+          </div>
+        </div>
+
+
+
+      {% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+    <button type="submit" class="btn btn-outline-success">Add</button>
+    &nbsp;<a class="btn btn-outline-secondary" href="{% url 'movies' %}">cancel</a>
+  </form>
+
+{% endblock content %}
