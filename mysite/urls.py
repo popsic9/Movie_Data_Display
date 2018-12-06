@@ -31,6 +31,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 
 
+
 urlpatterns = [
     path('', lambda r: HttpResponseRedirect('movierating/')),
     path('admin/', admin.site.urls),
@@ -38,4 +39,8 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), {'next_page': settings.LOGOUT_REDIRECT_URL}, name='logout'),
+    path('api-auth/', include('rest_framework.urls')),
+    path('movierating/api/rest-auth/', include('rest_auth.urls')),
+    path('movierating/api/rest-auth/registration/', include('rest_auth.registration.urls')),
+    path('movierating/api/', include('api.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

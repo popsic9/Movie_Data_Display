@@ -111,9 +111,9 @@ class Movie(models.Model):
 
 class MovieRating(models.Model):
     movie_rating_id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING)
-    movie = models.ForeignKey('Movie', models.DO_NOTHING)
-    rating = models.ForeignKey('Rating', models.DO_NOTHING)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    movie = models.ForeignKey('Movie', on_delete=models.CASCADE)
+    rating = models.ForeignKey('Rating', on_delete=models.CASCADE)
     timestamp = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -125,8 +125,8 @@ class MovieRating(models.Model):
     
 class Tag(models.Model):
     tag_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING)
-    movie = models.ForeignKey('Movie', models.DO_NOTHING, related_name='tags')
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    movie = models.ForeignKey('Movie', on_delete=models.CASCADE, related_name='tags')
     tag = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.IntegerField()
 
@@ -142,8 +142,8 @@ class Tag(models.Model):
 
 class MovieGenre(models.Model):
     movie_genre_id = models.IntegerField(primary_key=True)
-    movie = models.ForeignKey(Movie, models.DO_NOTHING)
-    genre = models.ForeignKey(Genre, models.DO_NOTHING)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -164,8 +164,8 @@ class User(models.Model):
     gender = models.CharField(max_length=45, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
     zipcode = models.CharField(max_length=45, blank=True, null=True)
-    age_range = models.ForeignKey(AgeRange, models.DO_NOTHING, blank=True, null=True)
-    work = models.ForeignKey('Work', models.DO_NOTHING, blank=True, null=True)
+    age_range = models.ForeignKey(AgeRange, on_delete=models.PROTECT, blank=True, null=True)
+    work = models.ForeignKey('Work', on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         managed = False
