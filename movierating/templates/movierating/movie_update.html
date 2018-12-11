@@ -38,11 +38,16 @@
           </div>
         </div>
   
+        <div class="row">
+            <div class="col-6">
+              {{ form.tag|as_crispy_field }} <p>For multiple tags, please split by ','</p>
+            </div>
+          </div>
 
   <button type="submit" class="btn btn-outline-success">Update</button>
   
   <!-- Restore missing button -->
-  &nbsp;<a class="btn btn-outline-secondary" href="{% url 'movie_detail' movie.pk %}">cancel</a>
+  &nbsp;<a class="btn btn-outline-secondary" href="{% url 'movie_detail' movie.pk %}">Cancel</a>
 
 </form>
 

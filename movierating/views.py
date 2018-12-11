@@ -3,11 +3,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse_lazy
 
-from .models import User
-from .models import Movie
-from .models import MovieGenre
+from .models import User, Movie, MovieGenre, MovieRating, Tag, MovieTag
 
-from .forms import MovieForm
+
+from .forms import MovieForm, MovieRatingForm
 from .filters import MovieFilter
 from django_filters.views import FilterView
 
@@ -52,7 +51,7 @@ class MovieDetailView(generic.DetailView):
 
 
 
-# how to update user information
+
 @method_decorator(login_required, name='dispatch')
 class MovieCreateView(generic.View):
 	model = Movie
@@ -60,8 +59,6 @@ class MovieCreateView(generic.View):
 
 	success_message = "Movie created successfully"
 	template_name = 'movierating/movie_new.html'
-	# fields = '__all__' <-- superseded by form_class
-	# success_url = reverse_lazy('heritagesites/site_list')
 
 	def dispatch(self, *args, **kwargs):
 		return super().dispatch(*args, **kwargs)
@@ -73,6 +70,10 @@ class MovieCreateView(generic.View):
 			l = len(Movie.objects.all())
 			newmovie.movie_id = l + 1;
 			newmovie.save()
+			#many to many for tag
+			for t in form.cleaned_data['tag']:
+				MovieTag.objects.create(movie=newmovie, tag=t)
+
 			#many to many for genre
 			for g in form.cleaned_data['genre']:
 				MovieGenre.objects.create(movie=newmovie, genre=g)
@@ -82,10 +83,6 @@ class MovieCreateView(generic.View):
 	def get(self, request):
 		form = MovieForm()
 		return render(request, 'movierating/movie_new.html', {'form': form})
-
-
-
-
 
 
 
@@ -106,11 +103,13 @@ class MovieDeleteView(generic.DeleteView):
 
 	def delete(self, request, *args, **kwargs):
 		self.object = self.get_object()
+		# Delete Movie Rating entries
+		MovieTag.objects.filter(movie_id=self.object.movie_id).delete()
 
 		# Delete Movie Genre entries
-		MovieGenre.objects \
-			.filter(movie_id=self.object.movie_id) \
-			.delete()
+		MovieGenre.objects.filter(movie_id=self.object.movie_id).delete()
+		
+		MovieRating.objects.filter(movie_id=self.object.movie_id).delete()
 
 		self.object.delete()
 		return HttpResponseRedirect(self.get_success_url())
@@ -129,9 +128,7 @@ class MovieDeleteView(generic.DeleteView):
 class MovieUpdateView(generic.UpdateView):
 	model = Movie
 	form_class = MovieForm
-	#fields = '__all__' #<-- superseded by form_class
 	context_object_name = 'movie'
-	# pk_url_kwarg = 'site_pk'
 	success_message = "Movie updated successfully"
 	template_name = 'movierating/movie_update.html'
 
@@ -143,18 +140,19 @@ class MovieUpdateView(generic.UpdateView):
 		newmovie = form.save(commit=False)
 		newmovie.save()
 
-		# Current country_area_id values linked to site
-		old_ids = MovieGenre.objects\
-			.values_list('genre_id', flat=True)\
-			.filter(movie_id=newmovie.movie_id)
+		# Current genre_id values linked to site
+		old_ids = MovieGenre.objects.values_list('genre_id', flat=True).filter(movie_id=newmovie.movie_id)
+		old_tag_ids = MovieTag.objects.values_list('tag_id', flat=True).filter(movie_id=newmovie.movie_id)
 
-		# New countries list
+		# New genre list
 		new_genres = form.cleaned_data['genre']
+		new_tags = form.cleaned_data['tag']
 
 		# New ids
 		new_ids = []
+		new_tag_ids = []
 
-		# Insert new unmatched country entries
+		# Insert new unmatched genre entries
 		for g in new_genres:
 			new_id = g.genre_id
 			new_ids.append(new_id)
@@ -162,6 +160,15 @@ class MovieUpdateView(generic.UpdateView):
 				continue
 			else:
 				MovieGenre.objects.create(movie=newmovie, genre=g)
+
+		for t in new_tags:
+			new_id = t.tag_id
+			new_tag_ids.append(new_id)
+			if new_id in old_tag_ids:
+				continue
+			else:
+				MovieTag.objects.create(movie=newmovie, tag=t)
+		
 
 		# Delete old unmatched movie genre entries
 		for old_id in old_ids:
@@ -172,12 +179,47 @@ class MovieUpdateView(generic.UpdateView):
 					.filter(movie_id=newmovie.movie_id, genre_id=old_id) \
 					.delete()
 
+		for old_id in old_tag_ids:
+			if old_id in new_tag_ids:
+				continue
+			else:
+				MovieTag.objects \
+					.filter(movie_id=newmovie.movie_id, tag_id=old_id) \
+					.delete()
+
 		return HttpResponseRedirect(newmovie.get_absolute_url())
 
 
 
 
 
+
+# how to update user information
+@method_decorator(login_required, name='dispatch')
+class MovieRatingView(generic.View):
+	model = MovieRating
+	form_class = MovieRatingForm
+	success_message = "Movie created successfully"
+	template_name = 'movierating/movie_rating.html'
+
+
+	def dispatch(self, *args, **kwargs):
+		return super().dispatch(*args, **kwargs)
+
+	def post(self, request, pk):
+		form = MovieRatingForm(request.POST)
+		print(form.errors)
+		if form.is_valid():
+			newrating = form.save(commit=False)
+			newrating.movie_id = pk;
+			newrating.save()
+			newmovie = Movie.objects.filter(movie_id=newrating.movie_id)
+			return redirect(newmovie[0])
+		return render(request, 'movierating/movie_rating.html', {'form': form, 'pk' : pk})
+
+	def get(self, request, pk):
+		form = MovieRatingForm()
+		return render(request, 'movierating/movie_rating.html', {'form': form, 'pk' : pk})
 
 
 

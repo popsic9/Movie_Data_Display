@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from mysite import secrets
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,8 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='368902674837-v4ajkohn11i47ge88if51eejvdercc8e.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VTC7IQxwh-p2OTGn-aCnQ_6L'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = secrets.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = secrets.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 LOGIN_URL = '/auth/login/google-oauth2/'
 # LOGIN_URL = 'login'
@@ -29,7 +30,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^8slr!f&@w%$1q+0!fv9r#u@*(8^prx3%=fjrqf16u)hkg-=1v'
+SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

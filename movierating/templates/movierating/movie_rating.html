@@ -1,0 +1,42 @@
+
+{% extends 'movierating/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+  <header>
+    <h2>Movie Rating</h2>
+  </header>
+
+  <!-- novalidate attribute required to render validation messages -->
+  <form method="post" novalidate>
+  {% csrf_token %}
+
+
+  <div class="row">
+    <div class="col-6">
+      {{ form.user|as_crispy_field }}
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-6">
+      {{ form.rating|as_crispy_field }}
+    </div>
+  </div>
+
+    <!-- Restore missing fields rendered using Bootstrap rows and columns classes --> 
+    
+    <div class="row">
+        <div class="col-6">
+          {{ form.timestamp|as_crispy_field }}
+        </div>
+      </div>
+
+  <button type="submit" class="btn btn-outline-success">Add</button>
+  &nbsp;<a class="btn btn-outline-secondary" href="{% url 'movie_detail' pk %}">Cancel</a>
+  
+
+</form>
+
+{% endblock content %}

@@ -1,5 +1,4 @@
-from movierating.models import AgeRange, Work, Genre, Rating, \
-	Movie, MovieRating, Tag, MovieGenre, User
+from movierating.models import AgeRange, Work, Genre, Rating, Movie, MovieRating, Tag, MovieGenre, User, MovieTag
 from rest_framework import response, serializers, status
 
 
@@ -8,7 +7,7 @@ class AgeRangeSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = AgeRange
-		fields = ('age_range_id', 'age_range_name')
+		fields = ('age_range_id', 'age_range_id')
 
 
 class WorkSerializer(serializers.ModelSerializer):
@@ -16,26 +15,6 @@ class WorkSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Work
 		fields = ('work_id', 'work_name')
-
-class UserSerializer(serializers.ModelSerializer):
-	age_range = AgeRangeSerializer(many=False, read_only=True)
-	work = WorkSerializer(many=False, read_only=True)
-
-	class Meta:
-		model = User
-		fields = (
-			'user_id',
-			'gender',
-			'age',
-			'zipcode',
-			'age_range',
-			'work')
-
-class GenreSerializer(serializers.ModelSerializer):
-
-	class Meta:
-		model = Genre
-		fields = ('genre_id', 'genre_name')
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -45,79 +24,80 @@ class RatingSerializer(serializers.ModelSerializer):
 		fields = ('rating_id', 'rating')
 
 
-class MovieRatingSerializer(serializers.ModelSerializer):
-	movie_id = serializers.ReadOnlyField(source='movie.movie_id')
-	user = UserSerializer(many=False, read_only=True)
-	rating = RatingSerializer(many=False, read_only=True)
-
-	class Meta:
-		model = MovieRating
-		fields = ('movie_rating_id', 'user', 'movie_id', 'rating', 'timestamp')
-
-
 
 
 class TagSerializer(serializers.ModelSerializer):
-	user = UserSerializer(many=False, read_only=True)
-	movie_id = serializers.ReadOnlyField(source='movie.movie_id')
-
 	class Meta:
 		model = Tag
-		fields = (
-			'tag_id',
-			'user',
-			'movie_id',
-			'tag',
-			'timestamp')
+		fields = ('tag_id', 'tag_name')
+
+
+class MovieTagSerializer(serializers.HyperlinkedModelSerializer):
+	tag_id = serializers.ReadOnlyField(source='tag.tag_id')
+	tag_name = serializers.ReadOnlyField(source='tag.tag_name')
+
+	class Meta:
+		model = MovieTag
+		fields = ('tag_id', 'tag_name')
 
 
 
 
-class MovieGenreSerializer(serializers.ModelSerializer):
-	movie_id = serializers.ReadOnlyField(source='movie.movie_id')
+class GenreSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = Genre
+		fields = ('genre_id', 'genre_name')
+
+
+class MovieGenreSerializer(serializers.HyperlinkedModelSerializer):
 	genre_id = serializers.ReadOnlyField(source='genre.genre_id')
+	genre_name = serializers.ReadOnlyField(source='genre.genre_name')
 
 	class Meta:
 		model = MovieGenre
-		fields = ('movie_id', 'genre_id')
+		fields = ('genre_id', 'genre_name')
 
+
+class UserSerializer(serializers.ModelSerializer):
+	age_range = AgeRangeSerializer(many=False, read_only=True)
+	work = WorkSerializer(many=False, read_only=True)
+
+	class Meta:
+		model = User
+		fields = ('user_id','gender','age','zipcode','age_range','work')
+
+
+class MovieRatingSerializer(serializers.HyperlinkedModelSerializer):
+	user_id = serializers.ReadOnlyField(source='user.user_id')
+	gender = serializers.ReadOnlyField(source='user.gender')
+	age = serializers.ReadOnlyField(source='user.age')
+	zipcode = serializers.ReadOnlyField(source='user.zipcode')
+	age_range = AgeRangeSerializer(many=False, read_only=True)
+	work = WorkSerializer(many=False, read_only=True)
+	rating = RatingSerializer(many=False, read_only=True)
+
+	class Meta:
+		model = MovieGenre
+		fields = ('user_id', 'gender', 'age','zipcode', 'age_range', 'work','rating')
 
 
 
 
 class MovieSerializer(serializers.ModelSerializer):
-	movie_title = serializers.CharField(
-		allow_blank=False,
-		max_length=255
-	)
-	imdbid = serializers.IntegerField(
-	)
-	tmdbid = serializers.IntegerField(
-	)
-
-	movie_genre = MovieGenreSerializer(
-		source='movie_genre_set', # Note use of _set
-		many=True,
-		read_only=True
-	)
+	movie_title = serializers.CharField(allow_blank=False,max_length=255)
+	imdbid = serializers.IntegerField()
+	tmdbid = serializers.IntegerField()
+	movie_rating = MovieRatingSerializer(source='movierating_set', many=True, read_only=True)
+	movie_genres = MovieGenreSerializer(source='moviegenre_set',many=True,read_only=True)
 	movie_genre_ids = serializers.PrimaryKeyRelatedField(
 		many=True,
 		write_only=True,
 		queryset=Genre.objects.all(),
-		source='movie_genre'
+		source='moviegenre'
 	)
-
-	user_rating = MovieRatingSerializer(
-		source='movie_rating_set', # Note use of _set
-		many=True,
-		read_only=True
-	)
-	user_rating_ids = serializers.PrimaryKeyRelatedField(
-		many=True,
-		write_only=True,
-		queryset=User.objects.all(),
-		source='movie_rating'
-	)
+	movie_tags = MovieTagSerializer(source='movietag_set',many=True,read_only=True)
+	movie_tag_ids = serializers.PrimaryKeyRelatedField(many=True,write_only=True,queryset=Tag.objects.all(),source='movietag')
 
 	class Meta:
 		model = Movie
@@ -126,41 +106,38 @@ class MovieSerializer(serializers.ModelSerializer):
 			'movie_title',
 			'imdbid',
 			'tmdbid',
-			'movie_genre',
+			'movie_genres',
 			'movie_genre_ids',
-			'user_rating',
-			'user_rating_ids'
+			'movie_tags',
+			'movie_tag_ids',
+			'movie_rating'
 		)
 
 	def create(self, validated_data):
-		"""
-		This method persists a new HeritageSite instance as well as adds all related
-		countries/areas to the heritage_site_jurisdiction table.  It does so by first
-		removing (validated_data.pop('heritage_site_jurisdiction')) from the validated
-		data before the new HeritageSite instance is saved to the database. It then loops
-		over the heritage_site_jurisdiction array in order to extract each country_area_id
-		element and add entries to junction/associative heritage_site_jurisdiction table.
-		:param validated_data:
-		:return: site
-		"""
-
-		# print(validated_data)
-
-		genres = validated_data.pop('movie_genre')
-		movie = Movie.objects.create(**validated_data)
+		genres = validated_data.pop('moviegenre')
+		tags = validated_data.pop('movietag')
+		newmovie = Movie.objects.create(**validated_data)
 
 		if genres is not None:
 			for g in genres:
 				MovieGenre.objects.create(
-					movie=movie.movie_id,
-					genre=g.genre_id
+					movie=newmovie,
+					genre=g
 				)
-		return movie
+		
+		if tags is not None:
+			for t in tags:
+				MovieTag.objects.create(
+					movie=newmovie,
+					tag=t
+				)
+		return newmovie
 
 	def update(self, instance, validated_data):
 		# site_id = validated_data.pop('heritage_site_id')
 		m_id = instance.movie_id
-		new_genre = validated_data.pop('movie_genre')
+		new_genre = validated_data.pop('moviegenre')
+		new_tag = validated_data.pop('movietag')
 
 		instance.movie_title = validated_data.get(
 			'movie_title',
@@ -178,7 +155,12 @@ class MovieSerializer(serializers.ModelSerializer):
 			.values_list('genre_id', flat=True) \
 			.filter(movie_id__exact=m_id)
 
-		# TODO Insert may not be required (Just return instance)
+		new_tag_ids = []
+		old_tag_ids = MovieTag.objects \
+			.values_list('tag_id', flat=True) \
+			.filter(movie_id__exact=m_id)
+
+		
 
 		# Insert new unmatched country entries
 		for g in new_genre:
@@ -190,6 +172,15 @@ class MovieSerializer(serializers.ModelSerializer):
 				MovieGenre.objects \
 					.create(movie_id=m_id, genre_id=new_id)
 
+		for t in new_tag:
+			new_id = t.tag_id
+			new_tag_ids.append(new_id)
+			if new_id in old_tag_ids:
+				continue
+			else:
+				MovieTag.objects \
+					.create(movie_id=m_id, tag_id=new_id)
+
 		# Delete old unmatched country entries
 		for old_id in old_ids:
 			if old_id in new_ids:
@@ -197,6 +188,14 @@ class MovieSerializer(serializers.ModelSerializer):
 			else:
 				MovieGenre.objects \
 					.filter(movie_id=m_id, genre_id=old_id) \
+					.delete()
+
+		for old_id in old_tag_ids:
+			if old_id in new_tag_ids:
+				continue
+			else:
+				MovieTag.objects \
+					.filter(movie_id=m_id, tag_id=old_id) \
 					.delete()
 
 		return instance

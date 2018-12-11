@@ -1,5 +1,5 @@
 import django_filters
-from movierating.models import Movie, Genre
+from movierating.models import Movie, Genre, Tag
 
 class MovieFilter(django_filters.FilterSet):
 	movie_title = django_filters.CharFilter(
@@ -19,17 +19,21 @@ class MovieFilter(django_filters.FilterSet):
 		lookup_expr = 'icontains'
 	)
 
+	tag = django_filters.ModelChoiceFilter(
+		field_name = 'tag',
+		label = 'Tag',
+		queryset = Tag.objects.all().distinct().order_by('tag_name'),
+		lookup_expr='exact'
+	)
 
 	genre = django_filters.ModelChoiceFilter(
 		field_name='genre',
 		label='Genre',
-		queryset=Genre.objects.all().order_by('genre_name'),
+		queryset=Genre.objects.all().distinct().order_by('genre_name'),
 		lookup_expr='exact'
 	)
 
 
 	class Meta:
 		model = Movie
-		# form = SearchForm
-		# fields [] is required, even if empty.
 		fields = []

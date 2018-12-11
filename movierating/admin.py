@@ -18,6 +18,13 @@ class GenreAdmin(admin.ModelAdmin):
 	ordering = ['genre_name']
 
 
+@admin.register(models.Tag)
+class TagAdmin(admin.ModelAdmin):
+	fields = ['tag_name']
+	list_display = ['tag_name']
+	ordering = ['tag_name']
+
+
 @admin.register(models.Rating)
 class RatingAdmin(admin.ModelAdmin):
 	fields = ['rating']
@@ -62,6 +69,18 @@ class MovieGenreAdmin(admin.ModelAdmin):
 		'genre'
 	]
 
+@admin.register(models.MovieTag)
+class MovieTagAdmin(admin.ModelAdmin):
+	fields = [
+		'movie',
+		'tag'
+	]
+
+	list_display = [
+		'movie',
+		'tag'
+	]
+
 
 @admin.register(models.MovieRating)
 class MovieRatingAdmin(admin.ModelAdmin):
@@ -80,22 +99,6 @@ class MovieRatingAdmin(admin.ModelAdmin):
 	]
 
 
-@admin.register(models.Tag)
-class TagAdmin(admin.ModelAdmin):
-	fields = [
-		'user',
-		'movie',
-        'tag',
-        'timestamp'
-	]
-
-	list_display = [
-		'user',
-		'movie',
-        'tag',
-        'timestamp'
-	]
-	list_filter = ['user', 'movie', 'tag']
 
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
