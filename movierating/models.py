@@ -92,7 +92,7 @@ class Tag(models.Model):
 
 
 class Movie(models.Model):
-    movie_id = models.IntegerField(primary_key=True)
+    movie_id = models.AutoField(primary_key=True)
     movie_title = models.CharField(max_length=100)
     imdbid = models.IntegerField(blank=True, null=True)
     tmdbid = models.IntegerField(blank=True, null=True)
@@ -143,12 +143,10 @@ class Movie(models.Model):
 
 
 class MovieRating(models.Model):
-    movie_rating_id = models.IntegerField(primary_key=True)
+    movie_rating_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     movie = models.ForeignKey('Movie', on_delete=models.CASCADE)
     rating = models.ForeignKey('Rating', on_delete=models.CASCADE)
-    timestamp = models.IntegerField(blank=True, null=True)
-
     class Meta:
         managed = False
         db_table = 'movie_rating'
@@ -158,8 +156,9 @@ class MovieRating(models.Model):
     
 
 
+
 class MovieGenre(models.Model):
-    movie_genre_id = models.IntegerField(primary_key=True)
+    movie_genre_id = models.AutoField(primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
@@ -172,7 +171,7 @@ class MovieGenre(models.Model):
 
 
 class MovieTag(models.Model):
-    movie_tag_id = models.IntegerField(primary_key=True)
+    movie_tag_id = models.AutoField(primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
@@ -188,7 +187,7 @@ class MovieTag(models.Model):
 
 
 class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
+    user_id = models.AutoField(primary_key=True)
     gender = models.CharField(max_length=45, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
     zipcode = models.CharField(max_length=45, blank=True, null=True)

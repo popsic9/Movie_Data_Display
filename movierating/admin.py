@@ -87,15 +87,13 @@ class MovieRatingAdmin(admin.ModelAdmin):
 	fields = [
 		'user',
 		'movie',   
-        'rating',
-        'timestamp'
+        'rating'
 	]
 
 	list_display = [
 		'user',
 		'movie',    
-        'rating',
-        'timestamp'
+        'rating'
 	]
 
 

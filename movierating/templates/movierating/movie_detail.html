@@ -87,25 +87,23 @@
               <p>Movie Rating</p>
             </div>
             <div class="col-sm-10">
-                <table border="1">
+                <table class="table table-sm" border="2">
                   <tr>
-                    <th>User Id</th>
-                    <th>Gender</th>
-                    <th>Age Range</th>
-                    <th>Zipcode</th>
-                    <th>Work</th>
-                    <th>Rating To Movie</th>
-                    <th>TimeStamp</th>
+                    <th scope="col">User Id</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Age Range</th>
+                    <th scope="col">Zipcode</th>
+                    <th scope="col">Work</th>
+                    <th scope="col">Rating To Movie</th>
                   </tr>
                   {% for r in movie.movierating_set.all %}
                   <tr>
-                    <td>{{ r.user.user_id }}</td>
-                    <td>{{ r.user.gender }}</td>
-                    <td>{{ r.user.age_range }}</td>
-                    <td>{{ r.user.zipcode }}</td>
-                    <td>{{ r.user.work }}</td>
-                    <td>{{ r.rating }}</td>
-                    <td>{{ r.timestamp }}</td>
+                    <td scope="row">{{ r.user.user_id }}</td>
+                    <td scope="row">{{ r.user.gender }}</td>
+                    <td scope="row">{{ r.user.age_range }}</td>
+                    <td scope="row">{{ r.user.zipcode }}</td>
+                    <td scope="row">{{ r.user.work }}</td>
+                    <td scope="row">{{ r.rating }}</td>
                   </tr>
                   {% endfor %}
                 </table>
